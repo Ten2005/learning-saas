@@ -32,7 +32,7 @@ export default function Home() {
         <Link
           href="/"
           className="
-          bg-foreground/70 text-background px-4 py-2 rounded-md text-center
+          bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
           shadow-md shadow-foreground/20 hover:shadow-foreground/40
           hover:bg-foreground hover:text-background/70
           active:shadow-foreground/40
