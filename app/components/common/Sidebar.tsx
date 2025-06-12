@@ -12,7 +12,7 @@ interface SidebarProps {
 
 const navigation = [
   {
-    name: "概要",
+    name: "オーバービュー",
     href: "/overview",
     icon: Home,
   },

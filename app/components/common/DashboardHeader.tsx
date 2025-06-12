@@ -27,14 +27,14 @@ export default function DashboardHeader({
 
   const handleLogoutConfirm = async () => {
     if (isLoggingOut || logoutSuccess) return;
-    
+
     setShowConfirmModal(false);
     setIsLoggingOut(true);
     try {
       await supabase.auth.signOut();
       setIsLoggingOut(false);
       setLogoutSuccess(true);
-      
+
       setTimeout(() => {
         router.push("/");
         router.refresh();
@@ -66,7 +66,7 @@ export default function DashboardHeader({
           </button>
           <h1 className="text-xl font-bold">{SERVICE_NAME}</h1>
         </div>
-        
+
         <button
           onClick={handleLogoutClick}
           disabled={isLoggingOut || logoutSuccess}
@@ -97,7 +97,6 @@ export default function DashboardHeader({
         </button>
       </div>
 
-      {/* 確認モーダル */}
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
           <div className="bg-background border border-foreground/20 rounded-lg p-6 max-w-sm w-full mx-4 shadow-lg">
@@ -121,8 +120,8 @@ export default function DashboardHeader({
               <button
                 onClick={handleLogoutConfirm}
                 className="
-                  px-4 py-2 rounded-md bg-foreground/90 text-background
-                  hover:bg-foreground/80 transition-colors duration-200
+                  px-4 py-2 rounded-md bg-foreground/80 text-background
+                  hover:bg-foreground/90 transition-colors duration-200
                 "
               >
                 ログアウト
