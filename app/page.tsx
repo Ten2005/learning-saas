@@ -1,6 +1,42 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    };
+
+    checkAuth();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const handleStart = () => {
+    if (isAuthenticated) {
+      router.push("/chat");
+    } else {
+      router.push("/login");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-screen p-8">
       <div className="flex flex-col gap-8 text-left">
@@ -29,18 +65,64 @@ export default function Home() {
           </p>
           <p className="text-foreground font-bold">洗練された学習空間を。</p>
         </div>
-        <Link
-          href="/chat"
-          className="
-          bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
-          shadow-md shadow-foreground/20 hover:shadow-foreground/40
-          hover:bg-foreground hover:text-background/70
-          active:shadow-foreground/40
-          active:bg-foreground active:text-background/70
-          transition-colors duration-300"
-        >
-          はじめる
-        </Link>
+
+        <div className="flex flex-col gap-4">
+          <button
+            onClick={handleStart}
+            className="
+              bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
+              shadow-md shadow-foreground/20 hover:shadow-foreground/40
+              hover:bg-foreground hover:text-background/70
+              active:shadow-foreground/40
+              active:bg-foreground active:text-background/70
+              transition-colors duration-300
+            "
+          >
+            {isAuthenticated === null
+              ? "読み込み中..."
+              : isAuthenticated
+                ? "チャットを開始"
+                : "ログインして始める"}
+          </button>
+
+          {isAuthenticated && (
+            <Link
+              href="/chat"
+              className="
+                text-foreground/60 hover:text-foreground/80
+                text-sm underline underline-offset-4
+                transition-colors duration-300
+              "
+            >
+              チャットページへ
+            </Link>
+          )}
+
+          {!isAuthenticated && isAuthenticated !== null && (
+            <div className="flex gap-4 text-sm">
+              <Link
+                href="/login"
+                className="
+                  text-foreground/60 hover:text-foreground/80
+                  underline underline-offset-4
+                  transition-colors duration-300
+                "
+              >
+                ログイン
+              </Link>
+              <Link
+                href="/signup"
+                className="
+                  text-foreground/60 hover:text-foreground/80
+                  underline underline-offset-4
+                  transition-colors duration-300
+                "
+              >
+                新規登録
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

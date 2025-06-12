@@ -28,7 +28,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const handleLinkClick = () => {
     // モバイルでのみサイドバーを閉じる
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
       onClose();
     }
   };
@@ -48,7 +48,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         className={cn(
           "fixed left-0 z-50 w-64 bg-background border-r border-foreground/10 transform transition-transform duration-300 ease-in-out",
           "top-[4.5rem] bottom-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <nav className="p-4">
@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                       "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                       isActive
                         ? "bg-primary text-primary-foreground"
-                        : "text-foreground/70 hover:text-foreground hover:bg-foreground/10"
+                        : "text-foreground/70 hover:text-foreground hover:bg-foreground/10",
                     )}
                   >
                     <item.icon className="mr-3 h-4 w-4" />
@@ -78,4 +78,4 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       </div>
     </>
   );
-} 
+}
