@@ -30,7 +30,7 @@ export default function Home() {
           <p className="text-foreground font-bold">洗練された学習空間を。</p>
         </div>
         <Link
-          href="/"
+          href="/chat"
           className="
           bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
           shadow-md shadow-foreground/20 hover:shadow-foreground/40
