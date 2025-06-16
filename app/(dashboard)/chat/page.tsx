@@ -4,43 +4,58 @@ import { useState } from "react";
 import InputArea from "@/app/components/common/InputArea";
 import MessageLoading from "@/app/components/conversation/MessageLoading";
 import Message from "@/app/components/conversation/Message";
-
-interface Message {
-  id: string;
-  content: string;
-  position: "right" | "left";
-  timestamp: Date;
-}
+import { Message as MessageType } from "@/types";
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
-    const userMessage: Message = {
+    const userMessage: MessageType = {
       id: Date.now().toString(),
       content: inputValue,
-      position: "right",
+      role: "user",
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputValue("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      const aiMessage: Message = {
+    try {
+      const response = await fetch("/api/chat/response", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: updatedMessages }),
+      });
+
+      const data = await response.json();
+
+      const aiMessage: MessageType = {
         id: (Date.now() + 1).toString(),
-        content: "こんにちは！どのようなことについて学びたいですか？",
-        position: "left",
+        content: data.message,
+        role: "assistant",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error calling API:", error);
+      const errorMessage: MessageType = {
+        id: (Date.now() + 1).toString(),
+        content: "エラーが発生しました。もう一度お試しください。",
+        role: "assistant",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 5000);
+    }
   };
 
   return (
@@ -52,7 +67,7 @@ export default function Chat() {
           </div>
         ) : (
           messages.map((message) => (
-            <Message key={message.id} message={message} />
+            <Message key={message.id} message={message} role={message.role} />
           ))
         )}
         {isLoading && <MessageLoading />}

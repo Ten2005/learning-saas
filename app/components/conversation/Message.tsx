@@ -1,21 +1,22 @@
-interface Message {
-  id: string;
-  content: string;
-  position: "left" | "right";
-  timestamp: Date;
-}
+import type { Message } from "@/types";
 
-export default function Message({ message }: { message: Message }) {
+export default function Message({
+  message,
+  role,
+}: {
+  message: Message;
+  role: "user" | "assistant";
+}) {
   return (
     <div
       key={message.id}
       className={`flex flex-col ${
-        message.position === "right" ? "items-end" : "items-start"
+        role === "user" ? "items-end" : "items-start"
       }`}
     >
       <div
         className={`p-3 rounded-md max-w-[90%] md:max-w-[80%] break-words ${
-          message.position === "right"
+          role === "user"
             ? "bg-foreground text-background"
             : "bg-foreground/10 text-foreground"
         }`}
