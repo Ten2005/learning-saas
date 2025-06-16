@@ -1,48 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useFormStore } from "@/stores/formStore";
 
 export default function SignupPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const {
+    signupEmail,
+    signupPassword,
+    signupConfirmPassword,
+    signupError,
+    signupMessage,
+    signupLoading,
+    setSignupEmail,
+    setSignupPassword,
+    setSignupConfirmPassword,
+    setSignupError,
+    setSignupMessage,
+    setSignupLoading,
+    resetSignupForm,
+  } = useFormStore();
+
   const router = useRouter();
   const supabase = createClient();
 
+  useEffect(() => {
+    resetSignupForm();
+  }, [resetSignupForm]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    setMessage("");
+    setSignupLoading(true);
+    setSignupError("");
+    setSignupMessage("");
 
-    if (password !== confirmPassword) {
-      setError("パスワードが一致しません。");
-      setIsLoading(false);
+    if (signupPassword !== signupConfirmPassword) {
+      setSignupError("パスワードが一致しません。");
+      setSignupLoading(false);
       return;
     }
 
-    if (password.length < 6) {
-      setError("パスワードは6文字以上で入力してください。");
-      setIsLoading(false);
+    if (signupPassword.length < 6) {
+      setSignupError("パスワードは6文字以上で入力してください。");
+      setSignupLoading(false);
       return;
     }
 
     try {
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: signupEmail,
+        password: signupPassword,
       });
 
       if (error) {
-        setError(error.message);
+        setSignupError(error.message);
       } else {
-        setMessage("確認メールを送信しました。メールをご確認ください。");
+        setSignupMessage("確認メールを送信しました。メールをご確認ください。");
         // 登録成功後、少し待ってからログインページにリダイレクト
         setTimeout(() => {
           router.push("/login");
@@ -50,9 +65,9 @@ export default function SignupPage() {
       }
     } catch (error) {
       console.error("Registration error:", error);
-      setError("登録に失敗しました。もう一度お試しください。");
+      setSignupError("登録に失敗しました。もう一度お試しください。");
     } finally {
-      setIsLoading(false);
+      setSignupLoading(false);
     }
   };
 
@@ -63,15 +78,15 @@ export default function SignupPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-4">
-            {error && (
+            {signupError && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded">
-                {error}
+                {signupError}
               </div>
             )}
 
-            {message && (
+            {signupMessage && (
               <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-3 rounded">
-                {message}
+                {signupMessage}
               </div>
             )}
 
@@ -82,8 +97,8 @@ export default function SignupPage() {
               <input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={signupEmail}
+                onChange={(e) => setSignupEmail(e.target.value)}
                 required
                 className="
                   px-4 py-3 rounded border border-foreground/20
@@ -103,8 +118,8 @@ export default function SignupPage() {
               <input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={signupPassword}
+                onChange={(e) => setSignupPassword(e.target.value)}
                 required
                 className="
                   px-4 py-3 rounded border border-foreground/20
@@ -127,8 +142,8 @@ export default function SignupPage() {
               <input
                 id="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={signupConfirmPassword}
+                onChange={(e) => setSignupConfirmPassword(e.target.value)}
                 required
                 className="
                   px-4 py-3 rounded border border-foreground/20
@@ -144,7 +159,7 @@ export default function SignupPage() {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={signupLoading}
             className="
               bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
               shadow-md shadow-foreground/20 hover:shadow-foreground/40
@@ -155,7 +170,7 @@ export default function SignupPage() {
               disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
-            {isLoading ? "登録中..." : "登録"}
+            {signupLoading ? "登録中..." : "登録"}
           </button>
         </form>
 

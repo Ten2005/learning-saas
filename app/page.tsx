@@ -1,33 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { isAuthenticated, isLoading, initialize } = useAuthStore();
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
-    };
-
-    checkAuth();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    initialize();
+  }, [initialize]);
 
   const handleStart = () => {
     if (isAuthenticated) {
@@ -78,7 +62,7 @@ export default function Home() {
               transition-colors duration-300
             "
           >
-            {isAuthenticated === null
+            {isLoading
               ? "読み込み中..."
               : isAuthenticated
                 ? "チャットを開始"
@@ -98,7 +82,7 @@ export default function Home() {
             </Link>
           )}
 
-          {!isAuthenticated && isAuthenticated !== null && (
+          {!isAuthenticated && !isLoading && (
             <div className="flex gap-4 text-sm">
               <Link
                 href="/login"

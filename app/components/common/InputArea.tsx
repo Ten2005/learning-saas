@@ -1,16 +1,12 @@
 import { Send } from "lucide-react";
+import { useChatStore } from "@/stores/chatStore";
 
-export default function InputArea({
-  inputValue,
-  setInputValue,
-  isLoading,
-  handleSendMessage,
-}: {
-  inputValue: string;
-  setInputValue: (value: string) => void;
-  handleSendMessage: () => void;
-  isLoading: boolean;
-}) {
+export default function InputArea() {
+  const { inputValue, setInputValue, isLoading, sendMessage } = useChatStore();
+
+  const handleSendMessage = () => {
+    sendMessage(inputValue);
+  };
   return (
     <div className="border-t border-foreground/10 p-4">
       <div className="flex gap-2 h-fit">

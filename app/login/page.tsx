@@ -1,40 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { useFormStore } from "@/stores/formStore";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const {
+    loginEmail,
+    loginPassword,
+    loginError,
+    loginLoading,
+    setLoginEmail,
+    setLoginPassword,
+    setLoginError,
+    setLoginLoading,
+    resetLoginForm,
+  } = useFormStore();
+
   const router = useRouter();
   const supabase = createClient();
 
+  useEffect(() => {
+    resetLoginForm();
+  }, [resetLoginForm]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
+    setLoginLoading(true);
+    setLoginError("");
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: loginEmail,
+        password: loginPassword,
       });
 
       if (error) {
-        setError(error.message);
+        setLoginError(error.message);
       } else {
         router.push("/overview");
         router.refresh();
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("ログインに失敗しました。もう一度お試しください。");
+      setLoginError("ログインに失敗しました。もう一度お試しください。");
     } finally {
-      setIsLoading(false);
+      setLoginLoading(false);
     }
   };
 
@@ -43,9 +56,9 @@ export default function LoginPage() {
       <div className="flex flex-col gap-8 text-left max-w-md w-full">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-4">
-            {error && (
+            {loginError && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded">
-                {error}
+                {loginError}
               </div>
             )}
 
@@ -56,8 +69,8 @@ export default function LoginPage() {
               <input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
                 required
                 className="
                   px-4 py-3 rounded border border-foreground/20
@@ -77,8 +90,8 @@ export default function LoginPage() {
               <input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
                 required
                 className="
                   px-4 py-3 rounded border border-foreground/20
@@ -94,7 +107,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={loginLoading}
             className="
               bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
               shadow-md shadow-foreground/20 hover:shadow-foreground/40
@@ -105,7 +118,7 @@ export default function LoginPage() {
               disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
-            {isLoading ? "ログイン中..." : "ログイン"}
+            {loginLoading ? "ログイン中..." : "ログイン"}
           </button>
         </form>
 

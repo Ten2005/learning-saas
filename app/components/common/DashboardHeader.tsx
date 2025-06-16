@@ -2,9 +2,9 @@
 
 import { Menu, X, LogOut, Check } from "lucide-react";
 import { SERVICE_NAME } from "@/consts/common";
-import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useUIStore } from "@/stores/uiStore";
+import { useAuthStore } from "@/stores/authStore";
 
 interface DashboardHeaderProps {
   onMenuClick: () => void;
@@ -16,10 +16,16 @@ export default function DashboardHeader({
   isSidebarOpen,
 }: DashboardHeaderProps) {
   const router = useRouter();
-  const supabase = createClient();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [logoutSuccess, setLogoutSuccess] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const { signOut } = useAuthStore();
+  const {
+    isLoggingOut,
+    logoutSuccess,
+    showConfirmModal,
+    setLoggingOut,
+    setLogoutSuccess,
+    setShowConfirmModal,
+    resetLogoutState,
+  } = useUIStore();
 
   const handleLogoutClick = () => {
     setShowConfirmModal(true);
@@ -29,19 +35,20 @@ export default function DashboardHeader({
     if (isLoggingOut || logoutSuccess) return;
 
     setShowConfirmModal(false);
-    setIsLoggingOut(true);
+    setLoggingOut(true);
     try {
-      await supabase.auth.signOut();
-      setIsLoggingOut(false);
+      await signOut();
+      setLoggingOut(false);
       setLogoutSuccess(true);
 
       setTimeout(() => {
         router.push("/");
         router.refresh();
+        resetLogoutState();
       }, 800);
     } catch (error) {
       console.error("ログアウトエラー:", error);
-      setIsLoggingOut(false);
+      setLoggingOut(false);
     }
   };
 
