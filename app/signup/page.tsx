@@ -34,7 +34,7 @@ export default function SignupPage() {
     }
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -48,7 +48,8 @@ export default function SignupPage() {
           router.push("/login");
         }, 3000);
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Registration error:", error);
       setError("登録に失敗しました。もう一度お試しください。");
     } finally {
       setIsLoading(false);

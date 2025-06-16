@@ -30,7 +30,8 @@ export default function LoginPage() {
         router.push("/overview");
         router.refresh();
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Login error:", error);
       setError("ログインに失敗しました。もう一度お試しください。");
     } finally {
       setIsLoading(false);
