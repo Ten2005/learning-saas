@@ -1,25 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
+import ButtonLink from "./components/common/ButtonLink";
 
 export default function Home() {
   const { isAuthenticated, isLoading, initialize } = useAuthStore();
-  const router = useRouter();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
-
-  const handleStart = () => {
-    if (isAuthenticated) {
-      router.push("/chat");
-    } else {
-      router.push("/login");
-    }
-  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen p-8">
@@ -51,59 +41,25 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <button
-            onClick={handleStart}
-            className="
-              bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
-              shadow-md shadow-foreground/20 hover:shadow-foreground/40
-              hover:bg-foreground hover:text-background/70
-              active:shadow-foreground/40
-              active:bg-foreground active:text-background/70
-              transition-colors duration-300
-            "
+          <ButtonLink
+            href={isAuthenticated ? "/chat" : "/login"}
+            variant="primary"
           >
             {isLoading
               ? "読み込み中..."
               : isAuthenticated
                 ? "チャットを開始"
                 : "ログインして始める"}
-          </button>
-
-          {isAuthenticated && (
-            <Link
-              href="/chat"
-              className="
-                text-foreground/60 hover:text-foreground/80
-                text-sm underline underline-offset-4
-                transition-colors duration-300
-              "
-            >
-              チャットページへ
-            </Link>
-          )}
+          </ButtonLink>
 
           {!isAuthenticated && !isLoading && (
             <div className="flex gap-4 text-sm">
-              <Link
-                href="/login"
-                className="
-                  text-foreground/60 hover:text-foreground/80
-                  underline underline-offset-4
-                  transition-colors duration-300
-                "
-              >
+              <ButtonLink href="/login" variant="primary">
                 ログイン
-              </Link>
-              <Link
-                href="/signup"
-                className="
-                  text-foreground/60 hover:text-foreground/80
-                  underline underline-offset-4
-                  transition-colors duration-300
-                "
-              >
+              </ButtonLink>
+              <ButtonLink href="/signup" variant="primary">
                 新規登録
-              </Link>
+              </ButtonLink>
             </div>
           )}
         </div>

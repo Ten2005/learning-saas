@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useFormStore } from "@/stores/formStore";
+import ButtonLink from "@/app/components/common/ButtonLink";
+import LabelInput from "@/app/components/common/LabelInput";
 
 export default function SignupPage() {
   const {
@@ -90,88 +91,43 @@ export default function SignupPage() {
               </div>
             )}
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-foreground/80 text-sm">
-                メールアドレス
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={signupEmail}
-                onChange={(e) => setSignupEmail(e.target.value)}
-                required
-                className="
-                  px-4 py-3 rounded border border-foreground/20
-                  bg-background text-foreground
-                  focus:border-foreground/40 focus:outline-none
-                  transition-colors duration-300
-                  placeholder:text-foreground/40
-                "
-                placeholder="your@email.com"
-              />
-            </div>
+            <LabelInput
+              label="メールアドレス"
+              id="email"
+              type="email"
+              value={signupEmail}
+              onChange={(e) => setSignupEmail(e.target.value)}
+              required
+              placeholder="your@email.com"
+            />
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-foreground/80 text-sm">
-                パスワード
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={signupPassword}
-                onChange={(e) => setSignupPassword(e.target.value)}
-                required
-                className="
-                  px-4 py-3 rounded border border-foreground/20
-                  bg-background text-foreground
-                  focus:border-foreground/40 focus:outline-none
-                  transition-colors duration-300
-                  placeholder:text-foreground/40
-                "
-                placeholder="••••••••"
-              />
-            </div>
+            <LabelInput
+              label="パスワード"
+              id="password"
+              type="password"
+              value={signupPassword}
+              onChange={(e) => setSignupPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+            />
 
-            <div className="flex flex-col gap-2">
-              <label
-                htmlFor="confirmPassword"
-                className="text-foreground/80 text-sm"
-              >
-                パスワード（確認）
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                value={signupConfirmPassword}
-                onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                required
-                className="
-                  px-4 py-3 rounded border border-foreground/20
-                  bg-background text-foreground
-                  focus:border-foreground/40 focus:outline-none
-                  transition-colors duration-300
-                  placeholder:text-foreground/40
-                "
-                placeholder="••••••••"
-              />
-            </div>
+            <LabelInput
+              label="パスワード（確認）"
+              id="confirmPassword"
+              type="password"
+              value={signupConfirmPassword}
+              onChange={(e) => setSignupConfirmPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={signupLoading}
-            className="
-              bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
-              shadow-md shadow-foreground/20 hover:shadow-foreground/40
-              hover:bg-foreground hover:text-background/70
-              active:shadow-foreground/40
-              active:bg-foreground active:text-background/70
-              transition-colors duration-300
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
+          <ButtonLink
+            href={signupLoading ? "/signup" : "/chat"}
+            variant="primary"
           >
             {signupLoading ? "登録中..." : "登録"}
-          </button>
+          </ButtonLink>
         </form>
 
         <div className="flex flex-col gap-4 text-center">
@@ -179,28 +135,14 @@ export default function SignupPage() {
             <p className="text-foreground/60 text-sm">
               既にアカウントをお持ちの方は
             </p>
-            <Link
-              href="/login"
-              className="
-                text-foreground/80 hover:text-foreground
-                underline underline-offset-4
-                transition-colors duration-300
-              "
-            >
+            <ButtonLink href="/login" variant="outline">
               ログイン
-            </Link>
+            </ButtonLink>
           </div>
 
-          <Link
-            href="/"
-            className="
-              text-foreground/60 hover:text-foreground/80
-              text-sm underline underline-offset-4
-              transition-colors duration-300
-            "
-          >
+          <ButtonLink href="/" variant="outlineSecondary">
             トップページに戻る
-          </Link>
+          </ButtonLink>
         </div>
       </div>
     </div>

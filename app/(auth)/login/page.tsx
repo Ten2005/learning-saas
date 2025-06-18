@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useFormStore } from "@/stores/formStore";
+import ButtonLink from "@/app/components/common/ButtonLink";
+import LabelInput from "@/app/components/common/LabelInput";
 
 export default function LoginPage() {
   const {
@@ -54,6 +55,7 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center h-screen p-8">
       <div className="flex flex-col gap-8 text-left max-w-md w-full">
+        <h1 className="text-2xl font-bold text-center">ログイン</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-4">
             {loginError && (
@@ -62,64 +64,32 @@ export default function LoginPage() {
               </div>
             )}
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-foreground/80 text-sm">
-                メールアドレス
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                required
-                className="
-                  px-4 py-3 rounded border border-foreground/20
-                  bg-background text-foreground
-                  focus:border-foreground/40 focus:outline-none
-                  transition-colors duration-300
-                  placeholder:text-foreground/40
-                "
-                placeholder="your@email.com"
-              />
-            </div>
+            <LabelInput
+              label="メールアドレス"
+              id="email"
+              type="email"
+              value={loginEmail}
+              onChange={(e) => setLoginEmail(e.target.value)}
+              required
+              placeholder="your@email.com"
+            />
+            <LabelInput
+              label="パスワード"
+              id="password"
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+            />
 
-            <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-foreground/80 text-sm">
-                パスワード
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                required
-                className="
-                  px-4 py-3 rounded border border-foreground/20
-                  bg-background text-foreground
-                  focus:border-foreground/40 focus:outline-none
-                  transition-colors duration-300
-                  placeholder:text-foreground/40
-                "
-                placeholder="••••••••"
-              />
-            </div>
+            <ButtonLink
+              href={loginLoading ? "/login" : "/chat"}
+              variant="primary"
+            >
+              {loginLoading ? "ログイン中..." : "ログイン"}
+            </ButtonLink>
           </div>
-
-          <button
-            type="submit"
-            disabled={loginLoading}
-            className="
-              bg-foreground/70 text-background px-4 py-2 rounded text-center w-fit
-              shadow-md shadow-foreground/20 hover:shadow-foreground/40
-              hover:bg-foreground hover:text-background/70
-              active:shadow-foreground/40
-              active:bg-foreground active:text-background/70
-              transition-colors duration-300
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
-          >
-            {loginLoading ? "ログイン中..." : "ログイン"}
-          </button>
         </form>
 
         <div className="flex flex-col gap-4 text-center">
@@ -127,28 +97,14 @@ export default function LoginPage() {
             <p className="text-foreground/60 text-sm">
               まだアカウントをお持ちでない方は
             </p>
-            <Link
-              href="/signup"
-              className="
-                text-foreground/80 hover:text-foreground
-                underline underline-offset-4
-                transition-colors duration-300
-              "
-            >
+            <ButtonLink href="/signup" variant="outline">
               新規登録
-            </Link>
+            </ButtonLink>
           </div>
 
-          <Link
-            href="/"
-            className="
-              text-foreground/60 hover:text-foreground/80
-              text-sm underline underline-offset-4
-              transition-colors duration-300
-            "
-          >
+          <ButtonLink href="/" variant="outlineSecondary">
             トップページに戻る
-          </Link>
+          </ButtonLink>
         </div>
       </div>
     </div>
