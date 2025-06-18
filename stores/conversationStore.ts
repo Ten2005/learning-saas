@@ -7,6 +7,7 @@ interface ConversationState {
   isLoading: boolean;
   fetchConversations: () => Promise<void>;
   createNewConversation: (title?: string) => Promise<string | null>;
+  deleteConversation: (id: string) => Promise<boolean>;
   setCurrentConversation: (id: string | null) => void;
   clearConversations: () => void;
 }
@@ -60,6 +61,34 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
     } catch (error) {
       console.error("Error creating conversation:", error);
       return null;
+    }
+  },
+
+  deleteConversation: async (id: string) => {
+    try {
+      const response = await fetch(`/api/conversation/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const { conversations, currentConversationId } = get();
+        const updatedConversations = conversations.filter(
+          (conv) => conv.id !== id,
+        );
+        
+        set({
+          conversations: updatedConversations,
+          currentConversationId: currentConversationId === id ? null : currentConversationId,
+        });
+        
+        return true;
+      } else {
+        console.error("Error deleting conversation");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      return false;
     }
   },
 

@@ -41,16 +41,14 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col gap-4">
+          {isAuthenticated && (
           <ButtonLink
             href={isAuthenticated ? "/chat" : "/login"}
             variant="primary"
           >
-            {isLoading
-              ? "読み込み中..."
-              : isAuthenticated
-                ? "チャットを開始"
-                : "ログインして始める"}
+            チャットを開始
           </ButtonLink>
+          )}
 
           {!isAuthenticated && !isLoading && (
             <div className="flex gap-4 text-sm">

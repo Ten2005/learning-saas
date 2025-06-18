@@ -5,6 +5,7 @@ import { SERVICE_NAME } from "@/consts/common";
 import { useRouter } from "next/navigation";
 import { useUIStore } from "@/stores/uiStore";
 import { useAuthStore } from "@/stores/authStore";
+import Modal from "./Modal";
 
 interface DashboardHeaderProps {
   onMenuClick: () => void;
@@ -104,39 +105,15 @@ export default function DashboardHeader({
         </button>
       </div>
 
-      {showConfirmModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
-          <div className="bg-background border border-foreground/20 rounded-lg p-6 max-w-sm w-full mx-4 shadow-lg">
-            <h3 className="text-lg font-semibold mb-4 text-foreground">
-              ログアウトの確認
-            </h3>
-            <p className="text-foreground/80 mb-6">
-              本当にログアウトしますか？
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleLogoutCancel}
-                className="
-                  px-4 py-2 rounded-md border border-foreground/20
-                  text-foreground/80 hover:text-foreground
-                  hover:bg-foreground/5 transition-colors duration-200
-                "
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleLogoutConfirm}
-                className="
-                  px-4 py-2 rounded-md bg-foreground/80 text-background
-                  hover:bg-foreground/90 transition-colors duration-200
-                "
-              >
-                ログアウト
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={showConfirmModal}
+        title="ログアウトの確認"
+        message="本当にログアウトしますか？"
+        confirmText="ログアウト"
+        onCancel={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+        confirmButtonVariant="default"
+      />
     </>
   );
 }
