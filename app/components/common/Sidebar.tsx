@@ -60,7 +60,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   };
 
   const handleNewConversation = () => {
-    router.push("/chat/new");
+    router.push("/chat");
     handleLinkClick();
   };
 

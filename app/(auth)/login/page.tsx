@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useFormStore } from "@/stores/formStore";
 import ButtonLink from "@/app/components/common/ButtonLink";
 import LabelInput from "@/app/components/common/LabelInput";
+import Button from "@/app/components/common/Button";
 
 export default function LoginPage() {
   const {
@@ -40,15 +41,13 @@ export default function LoginPage() {
 
       if (error) {
         setLoginError(error.message);
-      } else {
-        router.push("/overview");
-        router.refresh();
       }
     } catch (error) {
       console.error("Login error:", error);
       setLoginError("ログインに失敗しました。もう一度お試しください。");
     } finally {
-      setLoginLoading(false);
+      router.push("/overview");
+      router.refresh();
     }
   };
 
@@ -83,12 +82,12 @@ export default function LoginPage() {
               placeholder="••••••••"
             />
 
-            <ButtonLink
-              href={loginLoading ? "/login" : "/chat"}
+            <Button
+              onClick={handleSubmit}
               variant="primary"
             >
               {loginLoading ? "ログイン中..." : "ログイン"}
-            </ButtonLink>
+            </Button>
           </div>
         </form>
 

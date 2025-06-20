@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useFormStore } from "@/stores/formStore";
 import ButtonLink from "@/app/components/common/ButtonLink";
 import LabelInput from "@/app/components/common/LabelInput";
+import Button from "@/app/components/common/Button";
 
 export default function SignupPage() {
   const {
@@ -67,8 +68,6 @@ export default function SignupPage() {
     } catch (error) {
       console.error("Registration error:", error);
       setSignupError("登録に失敗しました。もう一度お試しください。");
-    } finally {
-      setSignupLoading(false);
     }
   };
 
@@ -122,12 +121,12 @@ export default function SignupPage() {
             />
           </div>
 
-          <ButtonLink
-            href={signupLoading ? "/signup" : "/chat"}
+          <Button
+            onClick={handleSubmit}
             variant="primary"
           >
             {signupLoading ? "登録中..." : "登録"}
-          </ButtonLink>
+          </Button>
         </form>
 
         <div className="flex flex-col gap-4 text-center">

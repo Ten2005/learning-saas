@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
   const protectedRoutes = ["/chat", "/overview"];
-  const publicRoutes = ["/login", "/auth", "/signup"];
+  const publicRoutes = ["/login", "/signup"];
 
   const { pathname } = request.nextUrl;
 

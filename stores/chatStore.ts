@@ -35,7 +35,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   setConversationId: (id) => set({ conversationId: id }),
 
   loadMessagesForConversation: async (conversationId: string) => {
-    set({ isLoading: true });
     try {
       const response = await fetch(
         `/api/conversation/${conversationId}/messages`,
@@ -61,8 +60,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }
     } catch (error) {
       console.error("Error loading messages:", error);
-    } finally {
-      set({ isLoading: false });
     }
   },
 

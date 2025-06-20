@@ -8,6 +8,7 @@ interface UIState {
   showDeleteConversationModal: boolean;
   conversationToDelete: { id: string; title: string } | null;
   isDeleting: boolean;
+  headerMenuOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   toggleSidebar: () => void;
   setLoggingOut: (loading: boolean) => void;
@@ -16,6 +17,8 @@ interface UIState {
   setShowDeleteConversationModal: (show: boolean) => void;
   setConversationToDelete: (conversation: { id: string; title: string } | null) => void;
   setIsDeleting: (deleting: boolean) => void;
+  setHeaderMenuOpen: (open: boolean) => void;
+  toggleHeaderMenu: () => void;
   resetLogoutState: () => void;
   resetDeleteConversationState: () => void;
 }
@@ -28,6 +31,7 @@ export const useUIStore = create<UIState>((set) => ({
   showDeleteConversationModal: false,
   conversationToDelete: null,
   isDeleting: false,
+  headerMenuOpen: false,
 
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
 
@@ -47,6 +51,13 @@ export const useUIStore = create<UIState>((set) => ({
   setConversationToDelete: (conversation) => set({ conversationToDelete: conversation }),
 
   setIsDeleting: (deleting) => set({ isDeleting: deleting }),
+
+  setHeaderMenuOpen: (open) => set({ headerMenuOpen: open }),
+
+  toggleHeaderMenu: () =>
+    set((state) => ({
+      headerMenuOpen: !state.headerMenuOpen,
+    })),
 
   resetLogoutState: () =>
     set({

@@ -1,11 +1,13 @@
 "use client";
 
-import { Menu, X, LogOut, Check } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { SERVICE_NAME } from "@/consts/common";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useUIStore } from "@/stores/uiStore";
 import { useAuthStore } from "@/stores/authStore";
 import Modal from "./Modal";
+import HeaderMenu from "./HeaderMenu";
 
 interface DashboardHeaderProps {
   onMenuClick: () => void;
@@ -28,9 +30,21 @@ export default function DashboardHeader({
     resetLogoutState,
   } = useUIStore();
 
-  const handleLogoutClick = () => {
-    setShowConfirmModal(true);
-  };
+  // ログアウト成功時の遷移処理
+  useEffect(() => {
+    if (logoutSuccess) {
+      // 次のレンダリングサイクル後に遷移
+      const timeoutId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          router.push("/");
+          router.refresh();
+          resetLogoutState();
+        });
+      });
+      
+      return () => cancelAnimationFrame(timeoutId);
+    }
+  }, [logoutSuccess, router, resetLogoutState]);
 
   const handleLogoutConfirm = async () => {
     if (isLoggingOut || logoutSuccess) return;
@@ -41,12 +55,6 @@ export default function DashboardHeader({
       await signOut();
       setLoggingOut(false);
       setLogoutSuccess(true);
-
-      setTimeout(() => {
-        router.push("/");
-        router.refresh();
-        resetLogoutState();
-      }, 800);
     } catch (error) {
       console.error("ログアウトエラー:", error);
       setLoggingOut(false);
@@ -75,34 +83,7 @@ export default function DashboardHeader({
           <h1 className="text-xl font-bold">{SERVICE_NAME}</h1>
         </div>
 
-        <button
-          onClick={handleLogoutClick}
-          disabled={isLoggingOut || logoutSuccess}
-          className="
-            flex items-center gap-2 px-3 py-2 rounded-md 
-            hover:bg-foreground/10 text-foreground/80 hover:text-foreground
-            transition-colors duration-200
-            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent
-          "
-          aria-label="ログアウト"
-        >
-          {logoutSuccess ? (
-            <>
-              <Check className="h-4 w-4 text-green-600" />
-              <span className="text-sm text-green-600">ログアウト完了</span>
-            </>
-          ) : isLoggingOut ? (
-            <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/30 border-t-foreground/80" />
-              <span className="text-sm">ログアウト中...</span>
-            </>
-          ) : (
-            <>
-              <LogOut className="h-4 w-4" />
-              <span className="text-sm">ログアウト</span>
-            </>
-          )}
-        </button>
+        <HeaderMenu />
       </div>
 
       <Modal
