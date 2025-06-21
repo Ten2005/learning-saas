@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useConversationStore } from "@/stores/conversationStore";
 import { useUIStore } from "@/stores/uiStore";
 import Modal from "./Modal";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,7 +24,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     deleteConversation,
     setCurrentConversation,
   } = useConversationStore();
-  
+
   const {
     showDeleteConversationModal,
     conversationToDelete,
@@ -70,7 +71,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     handleLinkClick();
   };
 
-  const handleDeleteConversationClick = (conversationId: string, title: string) => {
+  const handleDeleteConversationClick = (
+    conversationId: string,
+    title: string,
+  ) => {
     setConversationToDelete({ id: conversationId, title });
     setShowDeleteConversationModal(true);
   };
@@ -80,10 +84,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     setShowDeleteConversationModal(false);
     setIsDeleting(true);
-    
+
     try {
       const success = await deleteConversation(conversationToDelete.id);
-      
+
       if (success) {
         if (pathname === `/chat/${conversationToDelete.id}`) {
           router.push("/chat");
@@ -145,16 +149,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {conversations.map((conversation) => {
                   const isActive = pathname === `/chat/${conversation.id}`;
                   const displayTitle = conversation.title || "新しい会話";
-                  const isDeletingThis = isDeleting && conversationToDelete?.id === conversation.id;
+                  const isDeletingThis =
+                    isDeleting && conversationToDelete?.id === conversation.id;
 
                   return (
-                    <li 
-                      key={conversation.id}
-                      className="relative group"
-                    >
+                    <li key={conversation.id} className="relative group">
                       <div className="flex items-center">
                         <button
-                          onClick={() => handleConversationClick(conversation.id)}
+                          onClick={() =>
+                            handleConversationClick(conversation.id)
+                          }
                           disabled={isDeletingThis}
                           className={cn(
                             "flex items-center w-full px-3 py-2 rounded-md text-sm font-medium transition-colors text-left",
@@ -165,15 +169,20 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                           )}
                         >
                           <MessageCircle className="mr-3 h-4 w-4 flex-shrink-0" />
-                          <span className="truncate flex-1">{displayTitle}</span>
+                          <span className="truncate flex-1">
+                            {displayTitle}
+                          </span>
                         </button>
-                        
+
                         {/* 削除ボタン */}
                         {!isDeletingThis && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteConversationClick(conversation.id, displayTitle);
+                              handleDeleteConversationClick(
+                                conversation.id,
+                                displayTitle,
+                              );
                             }}
                             className="absolute right-2 p-1 rounded-md text-foreground/50 hover:text-red-500 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100"
                             title="会話を削除"
@@ -181,11 +190,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <Trash2 className="h-4 w-4" />
                           </button>
                         )}
-                        
+
                         {/* 削除中インジケーター */}
                         {isDeletingThis && (
                           <div className="absolute right-2 p-1">
-                            <div className="h-4 w-4 border-2 border-foreground/20 border-t-foreground/60 rounded-full animate-spin" />
+                            <LoadingSpinner
+                              size="small"
+                              className="!border-foreground/20 !border-t-foreground/60"
+                            />
                           </div>
                         )}
                       </div>

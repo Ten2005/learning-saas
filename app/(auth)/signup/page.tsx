@@ -121,10 +121,7 @@ export default function SignupPage() {
             />
           </div>
 
-          <Button
-            onClick={handleSubmit}
-            variant="primary"
-          >
+          <Button onClick={handleSubmit} variant="primary">
             {signupLoading ? "登録中..." : "登録"}
           </Button>
         </form>

@@ -82,10 +82,7 @@ export default function LoginPage() {
               placeholder="••••••••"
             />
 
-            <Button
-              onClick={handleSubmit}
-              variant="primary"
-            >
+            <Button onClick={handleSubmit} variant="primary">
               {loginLoading ? "ログイン中..." : "ログイン"}
             </Button>
           </div>

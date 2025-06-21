@@ -35,7 +35,7 @@ export default function Modal({
 
   const maxWidthClasses = {
     sm: "max-w-sm",
-    md: "max-w-md", 
+    md: "max-w-md",
     lg: "max-w-lg",
   };
 
@@ -45,17 +45,15 @@ export default function Modal({
       : "px-4 py-2 rounded-md bg-foreground/80 text-background hover:bg-foreground/90 transition-colors duration-200";
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]"
       onClick={handleBackdropClick}
     >
-      <div className={`bg-background border border-foreground/20 rounded-lg p-6 ${maxWidthClasses[maxWidth]} w-full mx-4 shadow-lg`}>
-        <h3 className="text-lg font-semibold mb-4 text-foreground">
-          {title}
-        </h3>
-        <p className="text-foreground/80 mb-6">
-          {message}
-        </p>
+      <div
+        className={`bg-background border border-foreground/20 rounded-lg p-6 ${maxWidthClasses[maxWidth]} w-full mx-4 shadow-lg`}
+      >
+        <h3 className="text-lg font-semibold mb-4 text-foreground">{title}</h3>
+        <p className="text-foreground/80 mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
@@ -67,14 +65,11 @@ export default function Modal({
           >
             {cancelText}
           </button>
-          <button
-            onClick={onConfirm}
-            className={confirmButtonClasses}
-          >
+          <button onClick={onConfirm} className={confirmButtonClasses}>
             {confirmText}
           </button>
         </div>
       </div>
     </div>
   );
-} 
+}

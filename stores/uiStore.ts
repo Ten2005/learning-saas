@@ -4,7 +4,7 @@ interface UIState {
   sidebarOpen: boolean;
   isLoggingOut: boolean;
   logoutSuccess: boolean;
-  showConfirmModal: boolean;
+  showLogoutConfirmModal: boolean;
   showDeleteConversationModal: boolean;
   conversationToDelete: { id: string; title: string } | null;
   isDeleting: boolean;
@@ -13,9 +13,11 @@ interface UIState {
   toggleSidebar: () => void;
   setLoggingOut: (loading: boolean) => void;
   setLogoutSuccess: (success: boolean) => void;
-  setShowConfirmModal: (show: boolean) => void;
+  setShowLogoutConfirmModal: (show: boolean) => void;
   setShowDeleteConversationModal: (show: boolean) => void;
-  setConversationToDelete: (conversation: { id: string; title: string } | null) => void;
+  setConversationToDelete: (
+    conversation: { id: string; title: string } | null,
+  ) => void;
   setIsDeleting: (deleting: boolean) => void;
   setHeaderMenuOpen: (open: boolean) => void;
   toggleHeaderMenu: () => void;
@@ -27,7 +29,7 @@ export const useUIStore = create<UIState>((set) => ({
   sidebarOpen: false,
   isLoggingOut: false,
   logoutSuccess: false,
-  showConfirmModal: false,
+  showLogoutConfirmModal: false,
   showDeleteConversationModal: false,
   conversationToDelete: null,
   isDeleting: false,
@@ -44,11 +46,13 @@ export const useUIStore = create<UIState>((set) => ({
 
   setLogoutSuccess: (success) => set({ logoutSuccess: success }),
 
-  setShowConfirmModal: (show) => set({ showConfirmModal: show }),
+  setShowLogoutConfirmModal: (show) => set({ showLogoutConfirmModal: show }),
 
-  setShowDeleteConversationModal: (show) => set({ showDeleteConversationModal: show }),
+  setShowDeleteConversationModal: (show) =>
+    set({ showDeleteConversationModal: show }),
 
-  setConversationToDelete: (conversation) => set({ conversationToDelete: conversation }),
+  setConversationToDelete: (conversation) =>
+    set({ conversationToDelete: conversation }),
 
   setIsDeleting: (deleting) => set({ isDeleting: deleting }),
 
@@ -63,7 +67,7 @@ export const useUIStore = create<UIState>((set) => ({
     set({
       isLoggingOut: false,
       logoutSuccess: false,
-      showConfirmModal: false,
+      showLogoutConfirmModal: false,
     }),
 
   resetDeleteConversationState: () =>

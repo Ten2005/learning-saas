@@ -2,13 +2,45 @@ import { Send } from "lucide-react";
 import { useChatStore } from "@/stores/chatStore";
 
 export default function InputArea() {
-  const { inputValue, setInputValue, isLoading, sendMessage } = useChatStore();
+  const {
+    inputValue,
+    setInputValue,
+    isLoading,
+    sendMessage,
+    branchPointId,
+    sendMessageFromBranch,
+    setBranchPoint,
+  } = useChatStore();
 
-  const handleSendMessage = () => {
-    sendMessage(inputValue);
+  const handleSendMessage = async () => {
+    if (branchPointId) {
+      // 分岐モードの場合
+      await sendMessageFromBranch(inputValue, branchPointId);
+      setBranchPoint(null);
+    } else {
+      // 通常モードの場合
+      await sendMessage(inputValue);
+    }
   };
+
+  const handleCancel = () => {
+    setBranchPoint(null);
+    setInputValue("");
+  };
+
   return (
     <div className="border-t border-foreground/10 p-4">
+      {branchPointId && (
+        <div className="mb-2 flex items-center justify-between text-sm text-orange-600">
+          <span>分岐モード: 選択したメッセージから新しい会話を開始します</span>
+          <button
+            onClick={handleCancel}
+            className="text-gray-600 hover:text-gray-800 underline"
+          >
+            キャンセル
+          </button>
+        </div>
+      )}
       <div className="flex gap-2 h-fit">
         <textarea
           value={inputValue}
@@ -19,7 +51,9 @@ export default function InputArea() {
               handleSendMessage();
             }
           }}
-          placeholder="メッセージを入力..."
+          placeholder={
+            branchPointId ? "分岐する質問を入力..." : "メッセージを入力..."
+          }
           className="
           flex-1 p-3 border border-foreground/20 rounded-lg resize-none
           focus:outline-none focus:ring-2 focus:ring-foreground/30

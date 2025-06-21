@@ -75,12 +75,13 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
         const updatedConversations = conversations.filter(
           (conv) => conv.id !== id,
         );
-        
+
         set({
           conversations: updatedConversations,
-          currentConversationId: currentConversationId === id ? null : currentConversationId,
+          currentConversationId:
+            currentConversationId === id ? null : currentConversationId,
         });
-        
+
         return true;
       } else {
         console.error("Error deleting conversation");

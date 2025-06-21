@@ -42,12 +42,12 @@ export default function Home() {
 
         <div className="flex flex-col gap-4">
           {isAuthenticated && (
-          <ButtonLink
-            href={isAuthenticated ? "/chat" : "/login"}
-            variant="primary"
-          >
-            チャットを開始
-          </ButtonLink>
+            <ButtonLink
+              href={isAuthenticated ? "/chat" : "/login"}
+              variant="primary"
+            >
+              チャットを開始
+            </ButtonLink>
           )}
 
           {!isAuthenticated && !isLoading && (

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/app/components/common/Sidebar";
 import DashboardHeader from "@/app/components/common/DashboardHeader";
+import LoadingSpinner from "@/app/components/common/LoadingSpinner";
 import { useAuthStore } from "@/stores/authStore";
 import { useUIStore } from "@/stores/uiStore";
 
@@ -29,7 +30,7 @@ export default function DashboardLayout({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-foreground/60">読み込み中...</div>
+        <LoadingSpinner size="large" />
       </div>
     );
   }

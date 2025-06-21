@@ -15,5 +15,12 @@ export default function Button({
 
   const outlineSecondaryClasses =
     "text-foreground/60 hover:text-foreground/80 text-sm underline underline-offset-4 transition-colors duration-300";
-  return <button onClick={onClick} className={`${variant === "primary" ? primaryClasses : ""} ${variant === "outline" ? outlineClasses : ""} ${variant === "outlineSecondary" ? outlineSecondaryClasses : ""}`}>{children}</button>;
+  return (
+    <button
+      onClick={onClick}
+      className={`${variant === "primary" ? primaryClasses : ""} ${variant === "outline" ? outlineClasses : ""} ${variant === "outlineSecondary" ? outlineSecondaryClasses : ""}`}
+    >
+      {children}
+    </button>
+  );
 }

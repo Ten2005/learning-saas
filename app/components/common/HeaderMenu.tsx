@@ -1,17 +1,12 @@
 "use client";
 
-import { LogOut, MoreVertical } from "lucide-react";
+import { MessageSquare, LogOut, MoreVertical } from "lucide-react";
 import { useRef, useEffect } from "react";
 import { useUIStore } from "@/stores/uiStore";
 
 export default function HeaderMenu() {
-  const {
-    headerMenuOpen,
-    isLoggingOut,
-    logoutSuccess,
-    setHeaderMenuOpen,
-    setShowConfirmModal,
-  } = useUIStore();
+  const { headerMenuOpen, setHeaderMenuOpen, setShowLogoutConfirmModal } =
+    useUIStore();
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +29,7 @@ export default function HeaderMenu() {
 
   const handleLogoutClick = () => {
     setHeaderMenuOpen(false);
-    setShowConfirmModal(true);
+    setShowLogoutConfirmModal(true);
   };
 
   const toggleMenu = () => {
@@ -55,26 +50,47 @@ export default function HeaderMenu() {
       </button>
 
       {headerMenuOpen && (
-        <div className="
-          absolute right-0 top-full mt-2 w-48 
+        <div
+          className="
+          absolute right-0 top-full mt-4 w-48 
           bg-background border border-foreground/10 rounded-md shadow-lg
-          py-1 z-50
-        ">
-          <button
+          p-1 z-50 gap-2
+        "
+        >
+          <ButtonItem
+            icon={<MessageSquare className="h-4 w-4" />}
+            label="フィードバック"
+            onClick={() => {}}
+          />
+          <ButtonItem
+            icon={<LogOut className="h-4 w-4" />}
+            label="ログアウト"
             onClick={handleLogoutClick}
-            disabled={isLoggingOut || logoutSuccess}
-            className="
-              w-full flex items-center gap-3 px-4 py-2 text-left
-              hover:bg-foreground/10 text-foreground/80 hover:text-foreground
-              transition-colors duration-200
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent
-            "
-          >
-                <LogOut className="h-4 w-4" />
-                <span className="text-sm">ログアウト</span>
-          </button>
+          />
         </div>
       )}
     </div>
   );
-} 
+}
+
+function ButtonItem({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className="w-full flex items-center gap-3 px-4 py-2 text-left
+      hover:bg-foreground/10 text-foreground/80 hover:text-foreground
+      transition-colors duration-200"
+      onClick={onClick}
+    >
+      {icon}
+      <span className="text-sm">{label}</span>
+    </button>
+  );
+}
