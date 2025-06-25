@@ -5,7 +5,6 @@ interface ChatState {
   messages: Message[];
   inputValue: string;
   isLoading: boolean;
-  conversationId: string | null;
   lastMessageId: string | null;
   currentPath: string[]; // 現在の会話パス（メッセージIDのリスト）
   branchPointId: string | null; // 分岐ポイントのメッセージID
@@ -13,20 +12,23 @@ interface ChatState {
   addMessage: (message: Message) => void;
   setInputValue: (value: string) => void;
   setLoading: (loading: boolean) => void;
-  sendMessage: (content: string) => Promise<void>;
-  sendMessageFromBranch: (content: string, parentId: string) => Promise<void>;
+  sendMessage: (content: string, conversationId: string) => Promise<void>;
+  sendMessageFromBranch: (
+    content: string,
+    parentId: string,
+    conversationId: string,
+  ) => Promise<void>;
   clearMessages: () => void;
-  setConversationId: (id: string | null) => void;
   loadMessagesForConversation: (conversationId: string) => Promise<void>;
+  setCurrentPath: (path: string[]) => void;
   setBranchPoint: (messageId: string | null) => void;
-  switchToBranch: (branchPath: string[]) => void;
+  switchToBranch: (branchPath: string[], conversationId: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   inputValue: "",
   isLoading: false,
-  conversationId: null,
   lastMessageId: null,
   currentPath: [],
   branchPointId: null,
@@ -41,12 +43,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setLoading: (loading) => set({ isLoading: loading }),
 
-  setConversationId: (id) => set({ conversationId: id }),
+  setCurrentPath: (path) => set({ currentPath: path }),
 
   setBranchPoint: (messageId) => set({ branchPointId: messageId }),
 
-  switchToBranch: (branchPath) => {
-    const { conversationId } = get();
+  switchToBranch: (branchPath, conversationId) => {
     if (!conversationId) return;
 
     // 分岐パスに基づいてメッセージを再構築
@@ -60,6 +61,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
         `/api/conversation/${conversationId}/messages`,
       );
       const data = await response.json();
+
+      set({ currentPath: [], availableBranches: new Map() });
 
       if (response.ok) {
         // すべてのメッセージを取得
@@ -113,7 +116,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
         // 現在のパスに基づいてメッセージをフィルター
         const pathSet = new Set(currentPath);
-        const messages: Message[] = allMessages
+        const messages: Message[] = await allMessages
           .filter((msg) => pathSet.has(msg.id))
           .map((msg) => ({
             id: msg.id,
@@ -123,14 +126,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
           }))
           .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
+        if (messages.length === 0) {
+          console.log("No messages found");
+          return;
+        }
+
         set({
           messages,
-          conversationId,
           currentPath,
           availableBranches: branches,
           lastMessageId:
             messages.length > 0 ? messages[messages.length - 1].id : null,
         });
+        console.log(messages);
       } else {
         console.error("Error loading messages:", data.error);
       }
@@ -139,11 +147,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendMessage: async (content: string) => {
+  sendMessage: async (content: string, conversationId: string) => {
     if (!content.trim()) return;
 
-    const { messages, addMessage, setLoading, conversationId, lastMessageId } =
-      get();
+    const { messages, addMessage, setLoading, lastMessageId } = get();
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -173,7 +180,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
         const conversationData = await conversationResponse.json();
         if (conversationResponse.ok) {
           currentConversationId = conversationData.conversation.id;
-          set({ conversationId: currentConversationId });
 
           // 新しい会話が作成されたら会話一覧を更新とページ変更
           window.dispatchEvent(new CustomEvent("conversationUpdated"));
@@ -270,11 +276,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendMessageFromBranch: async (content: string, parentId: string) => {
+  sendMessageFromBranch: async (
+    content: string,
+    parentId: string,
+    conversationId: string,
+  ) => {
     if (!content.trim()) return;
 
-    const { conversationId, addMessage, setLoading, currentPath } = get();
-    if (!conversationId) return;
+    const { addMessage, setLoading, currentPath } = get();
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -393,7 +402,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   clearMessages: () =>
     set({
       messages: [],
-      conversationId: null,
       lastMessageId: null,
     }),
 }));

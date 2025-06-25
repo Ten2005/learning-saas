@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Sidebar from "@/app/components/common/Sidebar";
 import DashboardHeader from "@/app/components/common/DashboardHeader";
 import LoadingSpinner from "@/app/components/common/LoadingSpinner";
@@ -13,30 +12,21 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isLoading, isAuthenticated, initialize } = useAuthStore();
+  const { isLoading, initialize } = useAuthStore();
   const { sidebarOpen, setSidebarOpen, toggleSidebar } = useUIStore();
-  const router = useRouter();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [isLoading, isAuthenticated, router]);
-
+  // ミドルウェアで既に認証チェックが行われているため、
+  // ここでは認証状態の初期化のみを行い、リダイレクトは行わない
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <LoadingSpinner size="large" />
       </div>
     );
-  }
-
-  if (!user) {
-    return null;
   }
 
   return (

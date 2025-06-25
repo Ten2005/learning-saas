@@ -1,42 +1,26 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams } from "next/navigation";
 import { useChatStore } from "@/stores/chatStore";
-import { useConversationStore } from "@/stores/conversationStore";
 import ConversationScreen from "@/app/components/conversation/ConversationScreen";
+import { useConversationStore } from "@/stores/conversationStore";
 
 export default function Chat() {
-  const params = useParams();
-  const conversationId = params?.id as string;
+  const { messages, isLoading, loadMessagesForConversation, clearMessages } =
+    useChatStore();
 
-  const {
-    messages,
-    isLoading,
-    setConversationId,
-    loadMessagesForConversation,
-    clearMessages,
-  } = useChatStore();
-
-  const { setCurrentConversation } = useConversationStore();
+  const { currentConversationId, setCurrentConversation } =
+    useConversationStore();
 
   useEffect(() => {
-    if (conversationId) {
-      setConversationId(conversationId);
-      setCurrentConversation(conversationId);
-      loadMessagesForConversation(conversationId);
+    if (currentConversationId) {
+      clearMessages();
+      loadMessagesForConversation(currentConversationId);
     } else {
-      setConversationId(null);
       setCurrentConversation(null);
       clearMessages();
     }
-  }, [
-    conversationId,
-    setConversationId,
-    setCurrentConversation,
-    loadMessagesForConversation,
-    clearMessages,
-  ]);
+  }, [currentConversationId, loadMessagesForConversation, clearMessages]);
 
   return <ConversationScreen messages={messages} isLoading={isLoading} />;
 }

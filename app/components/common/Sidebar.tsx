@@ -65,8 +65,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     handleLinkClick();
   };
 
-  const handleConversationClick = (conversationId: string) => {
-    setCurrentConversation(conversationId);
+  const handleConversationClick = async (conversationId: string) => {
+    await setCurrentConversation(conversationId);
     router.push(`/chat/${conversationId}`);
     handleLinkClick();
   };

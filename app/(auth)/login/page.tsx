@@ -42,12 +42,11 @@ export default function LoginPage() {
       if (error) {
         setLoginError(error.message);
       }
+      router.push("/overview");
+      router.refresh();
     } catch (error) {
       console.error("Login error:", error);
       setLoginError("ログインに失敗しました。もう一度お試しください。");
-    } finally {
-      router.push("/overview");
-      router.refresh();
     }
   };
 
