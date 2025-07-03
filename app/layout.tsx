@@ -1,15 +1,22 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ErrorBoundary } from "@/app/components/common/ErrorBoundary";
+import { ToastContainer } from "@/app/components/common/ToastContainer";
 
-const inter = Inter({
+const geistSans = Geist({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: "Learning SaaS",
-  description: "Learning SaaS",
+  description: "AI-powered learning platform",
 };
 
 export default function RootLayout({
@@ -19,7 +26,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${inter.variable} antialiased`}>{children}</body>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ErrorBoundary>
+          {children}
+          <ToastContainer />
+        </ErrorBoundary>
+      </body>
     </html>
   );
 }

@@ -30,3 +30,6 @@ export interface MessageRecord {
   created_at: string;
   is_deleted: boolean;
 }
+
+// API関連の型をre-export
+export * from './api';
