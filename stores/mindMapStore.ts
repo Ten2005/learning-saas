@@ -16,9 +16,14 @@ interface MindMapState {
   nodes: Node[];
   edges: Edge[];
   loading: boolean;
+  showFullContent: boolean;
+  expandedNodes: Set<string>;
+  expansionVersion: number; // 展開状態の変更を追跡するためのバージョン番号
   setNodes: (nodes: Node[]) => void;
   setEdges: (edges: Edge[]) => void;
   setLoading: (loading: boolean) => void;
+  toggleFullContent: () => void;
+  toggleNodeExpansion: (nodeId: string) => void;
   onNodesChange: (changes: NodeChange[]) => void;
   onEdgesChange: (changes: EdgeChange[]) => void;
   onConnect: (connection: Connection) => void;
@@ -30,10 +35,33 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
   nodes: [],
   edges: [],
   loading: false,
+  showFullContent: false,
+  expandedNodes: new Set<string>(),
+  expansionVersion: 0,
 
   setNodes: (nodes) => set({ nodes }),
   setEdges: (edges) => set({ edges }),
   setLoading: (loading) => set({ loading }),
+
+  toggleFullContent: () => {
+    const { showFullContent, expansionVersion } = get();
+    set({ 
+      showFullContent: !showFullContent, 
+      expandedNodes: new Set<string>(), // 全体設定変更時に個別展開をクリア
+      expansionVersion: expansionVersion + 1 
+    });
+  },
+
+  toggleNodeExpansion: (nodeId) => {
+    const { expandedNodes, expansionVersion } = get();
+    const newExpandedNodes = new Set(expandedNodes);
+    if (expandedNodes.has(nodeId)) {
+      newExpandedNodes.delete(nodeId);
+    } else {
+      newExpandedNodes.add(nodeId);
+    }
+    set({ expandedNodes: newExpandedNodes, expansionVersion: expansionVersion + 1 });
+  },
 
   onNodesChange: (changes) => {
     const { nodes } = get();
@@ -56,6 +84,7 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
       return;
     }
 
+    const { showFullContent, expandedNodes } = get();
     const newNodes: Node[] = [];
     const newEdges: Edge[] = [];
     const messageMap = new Map<string, MessageRecord>();
@@ -82,16 +111,26 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
       y: number,
       levelWidth: number,
     ): number => {
-      const content =
-        msg.content.length > 100
-          ? msg.content.substring(0, 100) + "..."
+      // 表示内容を決定（個別展開 > ページレベル設定 > デフォルト短縮）
+      const isExpanded = expandedNodes.has(msg.id);
+      const shouldShowFull = isExpanded || showFullContent;
+      const content = shouldShowFull 
+        ? msg.content 
+        : msg.content.length > 100 
+          ? msg.content.substring(0, 100) + "..." 
           : msg.content;
 
       newNodes.push({
         id: msg.id,
         type: "messageNode",
         position: { x, y },
-        data: { label: content, role: msg.role },
+        data: { 
+          label: content, 
+          role: msg.role,
+          fullContent: msg.content,
+          isExpanded,
+          canExpand: msg.content.length > 100
+        },
       });
 
       const children = childrenMap.get(msg.id) || [];
@@ -132,6 +171,6 @@ export const useMindMapStore = create<MindMapState>((set, get) => ({
   },
 
   clearMindMap: () => {
-    set({ nodes: [], edges: [], loading: false });
+    set({ nodes: [], edges: [], loading: false, expandedNodes: new Set<string>(), expansionVersion: 0 });
   },
 }));

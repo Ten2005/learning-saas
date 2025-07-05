@@ -1,6 +1,7 @@
 "use client";
 
 import { useChatStore } from "@/stores/chatStore";
+import { useConversationStore } from "@/stores/conversationStore";
 import { MessageRecord } from "@/types";
 
 interface BranchNavigatorProps {
@@ -13,6 +14,7 @@ export default function BranchNavigator({
   onClose,
 }: BranchNavigatorProps) {
   const { availableBranches, currentPath, switchToBranch } = useChatStore();
+  const { currentConversationId } = useConversationStore();
 
   const branches = availableBranches.get(messageId);
   if (!branches || branches.length <= 1) return null;
@@ -20,10 +22,10 @@ export default function BranchNavigator({
   const handleBranchSwitch = (branch: MessageRecord) => {
     // 新しいパスを構築
     const messageIndex = currentPath.indexOf(messageId);
-    if (messageIndex === -1) return;
+    if (messageIndex === -1 || !currentConversationId) return;
 
     const newPath = [...currentPath.slice(0, messageIndex + 1), branch.id];
-    switchToBranch(newPath);
+    switchToBranch(newPath, currentConversationId);
     onClose();
   };
 

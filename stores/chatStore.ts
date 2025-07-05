@@ -12,11 +12,11 @@ interface ChatState {
   addMessage: (message: Message) => void;
   setInputValue: (value: string) => void;
   setLoading: (loading: boolean) => void;
-  sendMessage: (content: string, conversationId: string) => Promise<void>;
+  sendMessage: (content: string, conversationId: string | null) => Promise<void>;
   sendMessageFromBranch: (
     content: string,
     parentId: string,
-    conversationId: string,
+    conversationId: string | null,
   ) => Promise<void>;
   clearMessages: () => void;
   loadMessagesForConversation: (conversationId: string) => Promise<void>;
@@ -138,7 +138,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
           lastMessageId:
             messages.length > 0 ? messages[messages.length - 1].id : null,
         });
-        console.log(messages);
       } else {
         console.error("Error loading messages:", data.error);
       }
@@ -147,7 +146,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendMessage: async (content: string, conversationId: string) => {
+  sendMessage: async (content: string, conversationId: string | null) => {
     if (!content.trim()) return;
 
     const { messages, addMessage, setLoading, lastMessageId } = get();
@@ -279,7 +278,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   sendMessageFromBranch: async (
     content: string,
     parentId: string,
-    conversationId: string,
+    conversationId: string | null,
   ) => {
     if (!content.trim()) return;
 
@@ -383,7 +382,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         window.dispatchEvent(new CustomEvent("conversationUpdated"));
 
         // メッセージを再読み込みして分岐情報を更新
-        get().loadMessagesForConversation(conversationId);
+        get().loadMessagesForConversation(conversationId!);
       }
     } catch (error) {
       console.error("Error calling API:", error);

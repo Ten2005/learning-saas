@@ -1,7 +1,10 @@
 import { Send } from "lucide-react";
 import { useChatStore } from "@/stores/chatStore";
+import { useConversationStore } from "@/stores/conversationStore";
 
 export default function InputArea() {
+  const { currentConversationId } = useConversationStore();
+
   const {
     inputValue,
     setInputValue,
@@ -14,12 +17,10 @@ export default function InputArea() {
 
   const handleSendMessage = async () => {
     if (branchPointId) {
-      // 分岐モードの場合
-      await sendMessageFromBranch(inputValue, branchPointId);
+      await sendMessageFromBranch(inputValue, branchPointId, currentConversationId);
       setBranchPoint(null);
     } else {
-      // 通常モードの場合
-      await sendMessage(inputValue);
+      await sendMessage(inputValue, currentConversationId);
     }
   };
 

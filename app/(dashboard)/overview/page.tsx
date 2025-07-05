@@ -23,11 +23,20 @@ import "reactflow/dist/style.css";
 const MessageNode = ({
   data,
 }: {
-  data: { label: string; role: string; messageId: string; isInPath: boolean };
+  data: { 
+    label: string; 
+    role: string; 
+    messageId: string; 
+    isInPath: boolean;
+    fullContent?: string;
+    isExpanded?: boolean;
+    canExpand?: boolean;
+  };
 }) => {
   const router = useRouter();
   const { switchToBranch } = useChatStore();
   const { currentConversationId } = useConversationStore();
+  const { toggleNodeExpansion } = useMindMapStore();
 
   const bgColor =
     data.role === "user"
@@ -40,9 +49,12 @@ const MessageNode = ({
   const textColor = data.role === "user" ? "text-white" : "text-black";
   const borderColor = data.isInPath
     ? "border-blue-500 border-2"
-    : "border-gray-300 border";
+    : data.isExpanded
+      ? "border-orange-400 border-2" // 展開時は橙色の太いボーダー
+      : "border-gray-300 border";
 
-  const handleNodeClick = async () => {
+  const handleNodeClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!currentConversationId) return;
 
     // このノードまでのパスを構築
@@ -73,21 +85,53 @@ const MessageNode = ({
       }
 
       // パスを切り替えてチャット画面に移動
-      switchToBranch(path);
+      switchToBranch(path, currentConversationId);
       router.push(`/chat/${currentConversationId}`);
     }
   };
 
+  const handleExpandClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleNodeExpansion(data.messageId);
+  };
+
   return (
     <div
-      className={`px-4 py-2 rounded-lg ${bgColor} ${textColor} ${borderColor} shadow-md max-w-[300px] cursor-pointer hover:shadow-lg transition-shadow`}
-      onClick={handleNodeClick}
+      className={`px-4 py-2 rounded-lg ${bgColor} ${textColor} ${borderColor} shadow-md max-w-[400px] min-w-[200px] cursor-pointer hover:shadow-lg transition-all`}
     >
       <Handle type="target" position={Position.Top} />
-      <div className="text-sm font-medium mb-1">
-        {data.role === "user" ? "User" : "Assistant"}
+      
+      <div className="flex justify-between items-start mb-1">
+        <div className="text-sm font-medium">
+          {data.role === "user" ? "User" : "Assistant"}
+        </div>
+        {data.canExpand && (
+          <button
+            onClick={handleExpandClick}
+            className={`text-xs transition-all ${
+              data.isExpanded
+                ? data.role === "user"
+                  ? "text-white font-bold" 
+                  : "text-blue-700 font-bold"
+                : data.role === "user" 
+                  ? "text-white" 
+                  : "text-gray-600 "
+            }`}
+            title={data.isExpanded ? "折りたたむ" : "展開する"}
+          >
+            {data.isExpanded ? "部分表示" : "全表示"}
+          </button>
+        )}
       </div>
-      <div className="text-xs whitespace-pre-wrap">{data.label}</div>
+      
+      <div 
+        className="text-xs whitespace-pre-wrap break-words cursor-pointer"
+        onClick={handleNodeClick}
+        title="クリックしてチャット画面に移動"
+      >
+        {data.label}
+      </div>
+      
       <Handle type="source" position={Position.Bottom} />
     </div>
   );
@@ -104,7 +148,10 @@ export default function Overview() {
     nodes,
     edges,
     loading,
+    showFullContent,
+    expansionVersion,
     setLoading,
+    toggleFullContent,
     onNodesChange,
     onEdgesChange,
     onConnect,
@@ -146,6 +193,28 @@ export default function Overview() {
     createMindMapFromMessages,
     clearMindMap,
   ]);
+
+  // 表示モードが変更されたときにマインドマップを再構築
+  useEffect(() => {
+    if (currentConversationId && nodes.length > 0) {
+      const refetchMessages = async () => {
+        try {
+          const response = await fetch(
+            `/api/conversation/${currentConversationId}/messages`,
+          );
+          const data = await response.json();
+
+          if (response.ok) {
+            createMindMapFromMessages(data.messages);
+          }
+        } catch (error) {
+          console.error("Error refetching messages:", error);
+        }
+      };
+
+      refetchMessages();
+    }
+  }, [showFullContent, expansionVersion, currentConversationId, nodes.length, createMindMapFromMessages]);
 
   // 現在のパスに基づいてノードとエッジを更新
   const enhancedNodes: Node[] = nodes.map((node) => ({
@@ -192,7 +261,22 @@ export default function Overview() {
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full relative">
+      {/* 全体切り替えボタン */}
+      <div className="absolute top-4 right-4 z-10">
+        <button
+          onClick={toggleFullContent}
+          className={`px-4 py-2 rounded-lg shadow-lg font-medium text-sm transition-all duration-200 ${
+            showFullContent 
+              ? "bg-orange-500 text-white hover:bg-orange-600 hover:shadow-xl" 
+              : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:shadow-xl"
+          }`}
+          title={showFullContent ? "一部表示に切り替え" : "全表示に切り替え"}
+        >
+          {showFullContent ? "一部表示" : "全表示"}
+        </button>
+      </div>
+
       <ReactFlow
         nodes={enhancedNodes}
         edges={enhancedEdges}
